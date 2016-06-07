@@ -59,6 +59,21 @@ public class KochavaKit extends KitIntegration implements KitIntegration.Attribu
     }
 
     @Override
+    public void setUserAttributeList(String s, List<String> list) {
+        
+    }
+
+    @Override
+    public boolean supportsAttributeLists() {
+        return true;
+    }
+
+    @Override
+    public void setAllUserAttributes(Map<String, String> map, Map<String, List<String>> map1) {
+
+    }
+
+    @Override
     public void removeUserAttribute(String key) {
 
     }

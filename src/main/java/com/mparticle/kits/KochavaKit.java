@@ -38,7 +38,7 @@ public class KochavaKit extends KitIntegration implements KitIntegration.Attribu
         createKochava();
         if (feature != null) {
             feature.setAppLimitTracking(Boolean.parseBoolean(getSettings().get(LIMIT_ADD_TRACKING)));
-            Feature.setErrorDebug(Boolean.parseBoolean(getSettings().get(ENABLE_LOGGING)));
+            Feature.enableDebug(Boolean.parseBoolean(getSettings().get(ENABLE_LOGGING)));
         }
         return null;
     }

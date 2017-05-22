@@ -23,6 +23,8 @@ public class KochavaKit extends KitIntegration implements KitIntegration.Attribu
     private static final String ENABLE_LOGGING = "enableLogging";
     private Feature feature;
 
+    private static Map<String, String> identityLink;
+
     @Override
     public Object getInstance() {
         return feature;
@@ -115,6 +117,9 @@ public class KochavaKit extends KitIntegration implements KitIntegration.Attribu
             datamap.put(Feature.INPUTITEMS.APP_LIMIT_TRACKING, getSettings().get(LIMIT_ADD_TRACKING));
             datamap.put(Feature.INPUTITEMS.DEBUG_ON, Boolean.parseBoolean(getSettings().get(ENABLE_LOGGING)));
             datamap.put(Feature.INPUTITEMS.REQUEST_ATTRIBUTION, Boolean.parseBoolean(getSettings().get(RETRIEVE_ATT_DATA)));
+            if (identityLink != null) {
+                datamap.put(Feature.INPUTITEMS.IDENTITY_LINK, identityLink);
+            }
             feature = new Feature(getContext(), datamap);
 
         }
@@ -133,5 +138,9 @@ public class KochavaKit extends KitIntegration implements KitIntegration.Attribu
         }else {
             return null;
         }
+    }
+
+    public static void setIdentityLink(Map<String, String> identityLink) {
+        KochavaKit.identityLink = identityLink;
     }
 }

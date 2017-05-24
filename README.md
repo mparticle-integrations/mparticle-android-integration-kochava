@@ -18,6 +18,18 @@ This repository contains the [Kochava](https://www.kochava.com) integration for 
 
 [Kochava integration](http://docs.mparticle.com/?java#kochava)
 
+###IdentityLink
+
+If you would like to associate the Account Identity with a custom Identifier that is not the Device Identity, you can include the data in the Kochava kit's initialization, by calling `KochavaKit.setIdentityLink` before `MParticle.start()`
+
+```
+Map<String, String> identityLink = new HashMap<String, String>();
+identityLink.put("key1", "identity1");
+identityLink.put("key2", "identity2");
+KochavaKit.setIdentityLink(identityLink);
+```
+
+
 ### License
 
 [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)

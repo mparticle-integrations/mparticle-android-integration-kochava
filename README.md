@@ -8,7 +8,7 @@ This repository contains the [Kochava](https://www.kochava.com) integration for 
 
     ```groovy
     dependencies {
-        compile 'com.mparticle:android-kochava-kit:4+'
+        compile 'com.mparticle:android-kochava-kit:5+'
     }
     ```
 2. Follow the mParticle Android SDK [quick-start](https://github.com/mParticle/mparticle-android-sdk), then rebuild and launch your app, and verify that you see `"Kochava detected"` in the output of `adb logcat`.

@@ -7,13 +7,15 @@ import android.location.Location;
 import com.kochava.android.tracker.Feature;
 import com.kochava.android.tracker.ReferralCapture;
 import com.mparticle.MParticle;
+import com.mparticle.kits_core.KitIntegration;
+import com.mparticle.kits_core.ReportingMessage;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class KochavaKit extends KitIntegration implements KitIntegration.AttributeListener {
+public class KochavaKit extends AbstractKitIntegration implements KitIntegration.AttributeListener {
 
     private static final String APP_ID = "appId";
     private static final String USE_CUSTOMER_ID = "useCustomerId";
@@ -36,7 +38,7 @@ public class KochavaKit extends KitIntegration implements KitIntegration.Attribu
     }
 
     @Override
-    protected List<ReportingMessage> onKitCreate(Map<String, String> settings, Context context) {
+    public List<ReportingMessage> onKitCreate(Map<String, String> settings, Context context) {
         createKochava();
         if (feature != null) {
             feature.setAppLimitTracking(Boolean.parseBoolean(getSettings().get(LIMIT_ADD_TRACKING)));
@@ -131,7 +133,7 @@ public class KochavaKit extends KitIntegration implements KitIntegration.Attribu
             feature.setAppLimitTracking(optOutStatus);
             List<ReportingMessage> messageList = new LinkedList<ReportingMessage>();
             messageList.add(
-                    new ReportingMessage(this, ReportingMessage.MessageType.OPT_OUT, System.currentTimeMillis(), null)
+                    new ReportingMessageImpl(this, ReportingMessageImpl.MessageType.OPT_OUT, System.currentTimeMillis(), null)
                             .setOptOut(optOutStatus)
             );
             return messageList;

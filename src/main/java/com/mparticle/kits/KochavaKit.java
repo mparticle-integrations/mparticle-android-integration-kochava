@@ -7,8 +7,8 @@ import android.location.Location;
 import com.kochava.android.tracker.Feature;
 import com.kochava.android.tracker.ReferralCapture;
 import com.mparticle.MParticle;
-import com.mparticle.kits_core.KitIntegration;
-import com.mparticle.kits_core.ReportingMessage;
+import com.mparticle.kits.core.KitIntegration;
+import com.mparticle.kits.core.ReportingMessage;
 
 import java.util.HashMap;
 import java.util.LinkedList;

@@ -4,21 +4,55 @@ This repository contains the [Kochava](https://www.kochava.com) integration for 
 
 ### Adding the integration
 
-1. Add the kit dependency to your app's build.gradle:
+1. The Kochava Kit requires that you add Kochava's Maven server to your buildscript:
+
+    ```
+    repositories {
+        maven { url "https://kochava.bintray.com/maven" }
+        ...
+    }
+    ```
+2. Add the kit dependency to your app's build.gradle:
 
     ```groovy
     dependencies {
         compile 'com.mparticle:android-kochava-kit:5+'
     }
     ```
-2. Follow the mParticle Android SDK [quick-start](https://github.com/mParticle/mparticle-android-sdk), then rebuild and launch your app, and verify that you see `"Kochava detected"` in the output of `adb logcat`.
-3. Reference mParticle's integration docs below to enable the integration.
+3. Add the following dependencies to enable various Kochava capabilites.
+
+    >
+    > NOTE: Starting with Play Services 15 the dependency requirements have changed. The Android Advertising ID (adid) collection has moved out of play-services “base” and into “ads-identifier”. Use the appropriate option for the version of Play Services you are using as indicated below.
+    >
+    > ```
+    > dependencies {
+    >
+    >      //Required: Google Play Services Ads Identifier (If publishing to the Google Play Store)
+    >      implementation 'com.google.android.gms:play-services-ads-identifier:15.0.1'
+    >      //Required: If using Play Services prior to version 15.
+    >      //implementation 'com.google.android.gms:play-services-base:12.0.1'
+    >
+    >      //Required: Install Referrer (If publishing to the Google Play Store)
+    >      implementation 'com.android.installreferrer:installreferrer:1.0'
+    >
+    >      //Optional: Location Collection. Note: This feature must also be enabled server side before collection will occur.
+    >      implementation 'com.google.android.gms:play-services-location:15.0.1'
+    >
+    >      //Optional: Instant App Status Collection
+    >      implementation 'com.google.android.instantapps:instantapps:1.1.0'
+    >  }
+    > ```
+    >  https://support.kochava.com/sdk-integration/sdk-kochavatracker-android/_
+
+
+3. Follow the mParticle Android SDK [quick-start](https://github.com/mParticle/mparticle-android-sdk), then rebuild and launch your app, and verify that you see `"Kochava detected"` in the output of `adb logcat`.
+4. Reference mParticle's integration docs below to enable the integration.
 
 ### Documentation
 
 [Kochava integration](http://docs.mparticle.com/?java#kochava)
 
-###IdentityLink
+### IdentityLink
 
 If you would like to associate the Account Identity with a custom Identifier that is not the Device Identity, you can include the data in the Kochava kit's initialization, by calling `KochavaKit.setIdentityLink` before `MParticle.start()`
 

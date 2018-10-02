@@ -11,6 +11,12 @@ buildscript {
 
 apply plugin: 'com.mparticle.kit'
 
+repositories {
+    maven {
+        url "https://kochava.bintray.com/maven"
+    }
+}
+
 dependencies {
-    api fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.kochava.base:tracker:3.4.2'
 }

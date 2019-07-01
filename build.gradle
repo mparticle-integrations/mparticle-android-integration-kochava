@@ -11,6 +11,12 @@ buildscript {
 
 apply plugin: 'com.mparticle.kit'
 
+android {
+    defaultConfig {
+        minSdkVersion 14
+    }
+}
+
 repositories {
     maven {
         url "https://kochava.bintray.com/maven"

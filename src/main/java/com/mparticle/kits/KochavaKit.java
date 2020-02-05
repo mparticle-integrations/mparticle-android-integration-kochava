@@ -6,6 +6,8 @@ import android.location.Location;
 
 import com.kochava.base.AttributionUpdateListener;
 import com.kochava.base.DeepLinkListener;
+import com.kochava.base.Deeplink;
+import com.kochava.base.DeeplinkProcessedListener;
 import com.kochava.base.ReferralReceiver;
 import com.kochava.base.Tracker;
 import com.kochava.base.Tracker.Configuration;
@@ -26,6 +28,7 @@ import java.util.Map;
 public class KochavaKit extends KitIntegration implements KitIntegration.AttributeListener {
     public static final String ATTRIBUTION_PARAMETERS = "attribution";
     public static final String DEEPLINK_PARAMETERS = "deeplink";
+    public static final String ENHANCED_DEEPLINK_PARAMETERS = "enhancedDeeplink";
 
     private static final String APP_ID = "appId";
     private static final String USE_CUSTOMER_ID = "useCustomerId";
@@ -66,6 +69,7 @@ public class KochavaKit extends KitIntegration implements KitIntegration.Attribu
 
         if (attributionEnabled) {
             Tracker.setDeepLinkListener(getKitManager().getLaunchUri(), mDeepLinkListener);
+            Tracker.processDeeplink(getKitManager().getLaunchUri().toString(), mDeepLinkProcessedListener);
         }
         return null;
     }
@@ -183,6 +187,15 @@ public class KochavaKit extends KitIntegration implements KitIntegration.Attribu
         public void onDeepLink(Map<String, String> map) {
             if (!MPUtility.isEmpty(map)) {
                 setAttributionResultParameter(DEEPLINK_PARAMETERS, MPUtility.mapToJson(map));
+            }
+        }
+    };
+
+    private DeeplinkProcessedListener mDeepLinkProcessedListener = new DeeplinkProcessedListener() {
+        @Override
+        public void onDeeplinkProcessed(Deeplink deeplink) {
+            if (deeplink != null) {
+                setAttributionResultParameter(ENHANCED_DEEPLINK_PARAMETERS, deeplink.toJson());
             }
         }
     };

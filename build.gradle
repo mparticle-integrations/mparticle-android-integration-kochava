@@ -28,5 +28,5 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.kochava.base:tracker:3.8.0'
+    implementation 'com.kochava.base:tracker:3.9.0'
 }

@@ -16,7 +16,7 @@ This repository contains the [Kochava](https://www.kochava.com) integration for 
 
     ```groovy
     dependencies {
-        compile 'com.mparticle:android-kochava-kit:5+'
+        implementation 'com.mparticle:android-kochava-kit:5+'
     }
     ```
 3. Add the following dependencies to enable various Kochava capabilites.

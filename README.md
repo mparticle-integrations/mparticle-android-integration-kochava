@@ -4,22 +4,15 @@ This repository contains the [Kochava](https://www.kochava.com) integration for 
 
 ### Adding the integration
 
-1. The Kochava Kit requires that you add Kochava's Maven server to your buildscript:
-
     ```
-    repositories {
-        maven { url "https://kochava.bintray.com/maven" }
-        ...
-    }
-    ```
-2. Add the kit dependency to your app's build.gradle:
+1. Add the kit dependency to your app's build.gradle:
 
     ```groovy
     dependencies {
         implementation 'com.mparticle:android-kochava-kit:5+'
     }
     ```
-3. Add the following dependencies to enable various Kochava capabilites.
+2. Add the following dependencies to enable various Kochava capabilites.
 
     >
     > NOTE: Starting with Play Services 15 the dependency requirements have changed. The Android Advertising ID (adid) collection has moved out of play-services “base” and into “ads-identifier”. Use the appropriate option for the version of Play Services you are using as indicated below.

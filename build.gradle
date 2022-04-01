@@ -23,5 +23,5 @@ android {
 }
 
 dependencies {
-    api 'com.kochava.base:tracker:3.10.1'
+    api 'com.kochava.base:tracker:3.11.0'
 }

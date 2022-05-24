@@ -43,7 +43,7 @@ This repository contains the [Kochava](https://www.kochava.com) integration for 
 
 ### Documentation
 
-[Kochava integration](http://docs.mparticle.com/?java#kochava)
+[Kochava integration](https://docs.mparticle.com/integrations/kochava/event/)
 
 ### IdentityLink
 

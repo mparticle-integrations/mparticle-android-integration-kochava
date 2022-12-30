@@ -3,7 +3,7 @@ updates:
 - package-ecosystem: gradle
   directory: "/"
   target-branch: "development"
-    labels: [ "dependabot" ]
+  labels: [ "dependabot" ]
   schedule:
     interval: "daily"
   open-pull-requests-limit: 10

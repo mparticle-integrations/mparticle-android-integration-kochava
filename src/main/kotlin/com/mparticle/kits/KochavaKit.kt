@@ -70,16 +70,11 @@ class KochavaKit : KitIntegration(), AttributeListener {
     override fun setInstallReferrer(intent: Intent) {}
 
     override fun setUserIdentity(identityType: IdentityType, id: String) {
-        if (identityType == IdentityType.CustomerId) {
-            if (!settings.containsKey(USE_CUSTOMER_ID) ||
-                (settings[USE_CUSTOMER_ID].toBoolean())
-            ) {
-                Tracker.getInstance().registerIdentityLink(identityType.name, id)
-            }
-        } else {
-            if ((settings[INCLUDE_ALL_IDS]).toBoolean()) {
-                Tracker.getInstance().registerIdentityLink(identityType.name, id)
-            }
+        if ((identityType == IdentityType.CustomerId) && (!settings.containsKey(USE_CUSTOMER_ID) ||
+                        (settings[USE_CUSTOMER_ID].toBoolean()))) {
+            Tracker.getInstance().registerIdentityLink(identityType.name, id)
+        } else if ((settings[INCLUDE_ALL_IDS]).toBoolean()) {
+            Tracker.getInstance().registerIdentityLink(identityType.name, id)
         }
     }
 

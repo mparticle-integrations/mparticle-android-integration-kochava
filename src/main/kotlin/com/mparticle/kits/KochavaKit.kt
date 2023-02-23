@@ -2,21 +2,16 @@ package com.mparticle.kits
 
 import android.content.Context
 import com.mparticle.kits.KitIntegration.AttributeListener
-import com.kochava.base.Tracker
-import com.kochava.base.Tracker.IdentityLink
+import com.kochava.tracker.Tracker
 import android.content.Intent
 import android.location.Location
-import com.kochava.base.ReferralReceiver
+import com.kochava.tracker.log.LogLevel
 import com.mparticle.MParticle.IdentityType
 import java.util.HashMap
 import org.json.JSONObject
 import com.mparticle.AttributionResult
 import org.json.JSONException
 import com.mparticle.AttributionError
-import com.kochava.base.AttributionUpdateListener
-import com.kochava.base.DeepLinkListener
-import com.mparticle.internal.MPUtility
-import com.kochava.base.DeeplinkProcessedListener
 
 class KochavaKit : KitIntegration(), AttributeListener {
     override fun getName(): String = NAME
@@ -26,27 +21,41 @@ class KochavaKit : KitIntegration(), AttributeListener {
         context: Context
     ): List<ReportingMessage>? {
         val attributionEnabled = java.lang.Boolean.parseBoolean(getSettings()[RETRIEVE_ATT_DATA])
-        var logLevel = Tracker.LOG_LEVEL_NONE
+        var logLevel = LogLevel.NONE
         if (java.lang.Boolean.parseBoolean(getSettings()[ENABLE_LOGGING])) {
-            logLevel = Tracker.LOG_LEVEL_DEBUG
+            logLevel = LogLevel.DEBUG
         }
-        val configuration = getSettings()[APP_ID]?.let {
-            Tracker.Configuration(context.applicationContext)
-                .setLogLevel(logLevel)
-                .setAppGuid(it)
-                .setAppLimitAdTracking(java.lang.Boolean.parseBoolean(getSettings()[LIMIT_ADD_TRACKING]))
-        }
+        Tracker.getInstance().setLogLevel(logLevel)
+
+        Tracker.getInstance().setAppLimitAdTracking(java.lang.Boolean.parseBoolean(getSettings()[LIMIT_ADD_TRACKING]))
+        val configuration = getSettings()[APP_ID]
         if (configuration != null) {
+            Tracker.getInstance().startWithAppGuid(context.applicationContext, configuration)
+
             identityLink?.let {
-                configuration.setIdentityLink(IdentityLink().add(it))
+                for (link in it) {
+                    Tracker.getInstance().registerIdentityLink(link.key, link.value)
+                }
             }
             if (attributionEnabled) {
-                configuration.setAttributionUpdateListener(mAttributionListener)
+                val currentInstallAttribution = Tracker.getInstance().installAttribution
+                if(!currentInstallAttribution.isRetrieved) {
+                    Tracker.getInstance().retrieveInstallAttribution { installAttribution ->
+                        try {
+                            setAttributionResultParameter(ATTRIBUTION_PARAMETERS, installAttribution.toJson())
+                        } catch (e: JSONException) {
+                            val error = AttributionError()
+                                    .setMessage("unable to parse attribution JSON:\n $installAttribution")
+                            kitManager.onError(error)
+                        }
+                    }
+                }
             }
-            Tracker.configure(configuration)
             if (attributionEnabled) {
-                Tracker.setDeepLinkListener(kitManager.launchUri, mDeepLinkListener)
-                Tracker.processDeeplink(kitManager.launchUri.toString(), mDeepLinkProcessedListener)
+                Tracker.getInstance().processDeeplink(kitManager.launchUri.toString()) { deeplink ->
+                    setAttributionResultParameter(ENHANCED_DEEPLINK_PARAMETERS, deeplink.toJson())
+
+                }
             }
         }
         return null
@@ -58,25 +67,14 @@ class KochavaKit : KitIntegration(), AttributeListener {
     override fun supportsAttributeLists(): Boolean = true
     override fun setAllUserAttributes(map: Map<String, String>, map1: Map<String, List<String>>) {}
     override fun removeUserAttribute(key: String) {}
-    override fun setInstallReferrer(intent: Intent) {
-        ReferralReceiver().onReceive(context, intent)
-    }
+    override fun setInstallReferrer(intent: Intent) {}
 
     override fun setUserIdentity(identityType: IdentityType, id: String) {
-        if (identityType == IdentityType.CustomerId) {
-            if (!settings.containsKey(USE_CUSTOMER_ID) ||
-                (settings[USE_CUSTOMER_ID].toBoolean())
-            ) {
-                val map = HashMap<String, String>(1)
-                map[identityType.name] = id
-                Tracker.setIdentityLink(IdentityLink().add(map))
-            }
-        } else {
-            if ((settings[INCLUDE_ALL_IDS]).toBoolean()) {
-                val map = HashMap<String, String>(1)
-                map[identityType.name] = id
-                Tracker.setIdentityLink(IdentityLink().add(map))
-            }
+        if ((identityType == IdentityType.CustomerId) && (!settings.containsKey(USE_CUSTOMER_ID) ||
+                        (settings[USE_CUSTOMER_ID].toBoolean()))) {
+            Tracker.getInstance().registerIdentityLink(identityType.name, id)
+        } else if ((settings[INCLUDE_ALL_IDS]).toBoolean()) {
+            Tracker.getInstance().registerIdentityLink(identityType.name, id)
         }
     }
 
@@ -84,7 +82,7 @@ class KochavaKit : KitIntegration(), AttributeListener {
     override fun logout(): List<ReportingMessage> = emptyList()
 
     override fun setOptOut(optOutStatus: Boolean): List<ReportingMessage> {
-        Tracker.setAppLimitAdTracking(optOutStatus)
+        Tracker.getInstance().setAppLimitAdTracking(optOutStatus)
 
         return listOf(
             ReportingMessage(
@@ -109,26 +107,6 @@ class KochavaKit : KitIntegration(), AttributeListener {
                 .setMessage(e.message)
             kitManager.onError(error)
         }
-    }
-
-    private val mAttributionListener = AttributionUpdateListener { s ->
-        try {
-            val attributionJson = JSONObject(s)
-            setAttributionResultParameter(ATTRIBUTION_PARAMETERS, attributionJson)
-        } catch (e: JSONException) {
-            val error = AttributionError()
-                .setMessage("unable to parse attribution JSON:\n $s")
-                .setServiceProviderId(configuration.kitId)
-            kitManager.onError(error)
-        }
-    }
-    private val mDeepLinkListener = DeepLinkListener { map ->
-        if (!MPUtility.isEmpty(map)) {
-            setAttributionResultParameter(DEEPLINK_PARAMETERS, MPUtility.mapToJson(map))
-        }
-    }
-    private val mDeepLinkProcessedListener = DeeplinkProcessedListener { deeplink ->
-        setAttributionResultParameter(ENHANCED_DEEPLINK_PARAMETERS, deeplink.toJson())
     }
 
     companion object {

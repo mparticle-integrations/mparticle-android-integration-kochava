@@ -28,10 +28,10 @@ class KochavaKit : KitIntegration(), AttributeListener {
         Tracker.getInstance().setLogLevel(logLevel)
 
         Tracker.getInstance().setAppLimitAdTracking(java.lang.Boolean.parseBoolean(getSettings()[LIMIT_ADD_TRACKING]))
-        val configuration = getSettings()[APP_ID]?.let {
-            Tracker.getInstance().startWithAppGuid(context.applicationContext, it)
-        }
+        val configuration = getSettings()[APP_ID]
         if (configuration != null) {
+            Tracker.getInstance().startWithAppGuid(context.applicationContext, configuration)
+
             identityLink?.let {
                 for (link in it) {
                     Tracker.getInstance().registerIdentityLink(link.key, link.value)

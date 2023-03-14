@@ -40,7 +40,7 @@ android {
 }
 
 dependencies {
-    def kochava_tracker_version = "4.2.1"
+    def kochava_tracker_version = "4.3.0"
     implementation("com.kochava.tracker:tracker:$kochava_tracker_version") // Required
     implementation("com.kochava.tracker:events:$kochava_tracker_version") // Optional
     implementation("com.kochava.tracker:engagement:$kochava_tracker_version") // Optional

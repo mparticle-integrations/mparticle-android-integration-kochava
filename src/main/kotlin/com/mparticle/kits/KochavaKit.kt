@@ -1,17 +1,16 @@
 package com.mparticle.kits
 
 import android.content.Context
-import com.mparticle.kits.KitIntegration.AttributeListener
-import com.kochava.tracker.Tracker
 import android.content.Intent
 import android.location.Location
+import com.kochava.tracker.Tracker
 import com.kochava.tracker.log.LogLevel
-import com.mparticle.MParticle.IdentityType
-import java.util.HashMap
-import org.json.JSONObject
-import com.mparticle.AttributionResult
-import org.json.JSONException
 import com.mparticle.AttributionError
+import com.mparticle.AttributionResult
+import com.mparticle.MParticle.IdentityType
+import com.mparticle.kits.KitIntegration.AttributeListener
+import org.json.JSONException
+import org.json.JSONObject
 
 class KochavaKit : KitIntegration(), AttributeListener {
     override fun getName(): String = NAME
@@ -27,7 +26,8 @@ class KochavaKit : KitIntegration(), AttributeListener {
         }
         Tracker.getInstance().setLogLevel(logLevel)
 
-        Tracker.getInstance().setAppLimitAdTracking(java.lang.Boolean.parseBoolean(getSettings()[LIMIT_ADD_TRACKING]))
+        Tracker.getInstance()
+            .setAppLimitAdTracking(java.lang.Boolean.parseBoolean(getSettings()[LIMIT_ADD_TRACKING]))
         val configuration = getSettings()[APP_ID]
         if (configuration != null) {
             Tracker.getInstance().startWithAppGuid(context.applicationContext, configuration)
@@ -39,13 +39,16 @@ class KochavaKit : KitIntegration(), AttributeListener {
             }
             if (attributionEnabled) {
                 val currentInstallAttribution = Tracker.getInstance().installAttribution
-                if(!currentInstallAttribution.isRetrieved) {
+                if (!currentInstallAttribution.isRetrieved) {
                     Tracker.getInstance().retrieveInstallAttribution { installAttribution ->
                         try {
-                            setAttributionResultParameter(ATTRIBUTION_PARAMETERS, installAttribution.toJson())
+                            setAttributionResultParameter(
+                                ATTRIBUTION_PARAMETERS,
+                                installAttribution.toJson()
+                            )
                         } catch (e: JSONException) {
                             val error = AttributionError()
-                                    .setMessage("unable to parse attribution JSON:\n $installAttribution")
+                                .setMessage("unable to parse attribution JSON:\n $installAttribution")
                             kitManager.onError(error)
                         }
                     }
@@ -70,11 +73,11 @@ class KochavaKit : KitIntegration(), AttributeListener {
     override fun setInstallReferrer(intent: Intent) {}
 
     override fun setUserIdentity(identityType: IdentityType, id: String) {
-        if ((identityType == IdentityType.CustomerId) && (!settings.containsKey(USE_CUSTOMER_ID) ||
-                        (settings[USE_CUSTOMER_ID].toBoolean()))) {
-            Tracker.getInstance().registerIdentityLink(identityType.name, id)
-        } else if ((settings[INCLUDE_ALL_IDS]).toBoolean()) {
-            Tracker.getInstance().registerIdentityLink(identityType.name, id)
+        val possibleIdentities = listOf(USER_IDENTIFICATION_TYPE, EMAIL_IDENTIFICATION_TYPE)
+        possibleIdentities.forEach {
+            if (it == identityType.name) {
+                Tracker.getInstance().registerIdentityLink(it, id)
+            }
         }
     }
 
@@ -114,8 +117,8 @@ class KochavaKit : KitIntegration(), AttributeListener {
         const val DEEPLINK_PARAMETERS = "deeplink"
         const val ENHANCED_DEEPLINK_PARAMETERS = "enhancedDeeplink"
         private const val APP_ID = "appId"
-        private const val USE_CUSTOMER_ID = "useCustomerId"
-        private const val INCLUDE_ALL_IDS = "passAllOtherIdentities"
+        private const val USER_IDENTIFICATION_TYPE = "CustomerId"
+        private const val EMAIL_IDENTIFICATION_TYPE = "Email"
         private const val LIMIT_ADD_TRACKING = "limitAdTracking"
         private const val RETRIEVE_ATT_DATA = "retrieveAttributionData"
         private const val ENABLE_LOGGING = "enableLogging"

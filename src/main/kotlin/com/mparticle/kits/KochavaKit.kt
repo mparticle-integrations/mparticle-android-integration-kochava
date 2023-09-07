@@ -8,11 +8,12 @@ import com.kochava.tracker.log.LogLevel
 import com.mparticle.AttributionError
 import com.mparticle.AttributionResult
 import com.mparticle.MParticle.IdentityType
+import com.mparticle.identity.MParticleUser
 import com.mparticle.kits.KitIntegration.AttributeListener
 import org.json.JSONException
 import org.json.JSONObject
 
-class KochavaKit : KitIntegration(), AttributeListener {
+class KochavaKit : KitIntegration(), AttributeListener, KitIntegration.IdentityListener {
     override fun getName(): String = NAME
 
     override fun onKitCreate(
@@ -37,34 +38,42 @@ class KochavaKit : KitIntegration(), AttributeListener {
                     Tracker.getInstance().registerIdentityLink(link.key, link.value)
                 }
             }
-            if (attributionEnabled) {
-                val currentInstallAttribution = Tracker.getInstance().installAttribution
-                if (!currentInstallAttribution.isRetrieved) {
-                    Tracker.getInstance().retrieveInstallAttribution { installAttribution ->
-                        try {
-                            setAttributionResultParameter(
-                                ATTRIBUTION_PARAMETERS,
-                                installAttribution.toJson()
-                            )
-                        } catch (e: JSONException) {
-                            val error = AttributionError()
-                                .setMessage("unable to parse attribution JSON:\n $installAttribution")
-                            kitManager.onError(error)
+            try {
+                if (attributionEnabled) {
+                    val currentInstallAttribution = Tracker.getInstance().installAttribution
+                    if (!currentInstallAttribution.isRetrieved) {
+                        Tracker.getInstance().retrieveInstallAttribution { installAttribution ->
+                            try {
+                                setAttributionResultParameter(
+                                    ATTRIBUTION_PARAMETERS,
+                                    installAttribution.toJson()
+                                )
+                            } catch (e: JSONException) {
+                                val error = AttributionError()
+                                    .setMessage("unable to parse attribution JSON:\n $installAttribution")
+                                kitManager.onError(error)
+                            }
                         }
                     }
-                }
-            }
-            if (attributionEnabled) {
-                Tracker.getInstance().processDeeplink(kitManager.launchUri.toString()) { deeplink ->
-                    setAttributionResultParameter(ENHANCED_DEEPLINK_PARAMETERS, deeplink.toJson())
+                    Tracker.getInstance()
+                        .processDeeplink(kitManager.launchUri.toString()) { deeplink ->
+                            setAttributionResultParameter(
+                                ENHANCED_DEEPLINK_PARAMETERS,
+                                deeplink.toJson()
+                            )
 
+                        }
                 }
+            } catch (e: Exception) {
+                e.toString()
             }
         }
         return null
     }
 
-    override fun setLocation(location: Location) {}
+    override fun setLocation(location: Location) {
+    }
+
     override fun setUserAttribute(attributeKey: String, attributeValue: String) {}
     override fun setUserAttributeList(s: String, list: List<String>) {}
     override fun supportsAttributeLists(): Boolean = true
@@ -127,5 +136,29 @@ class KochavaKit : KitIntegration(), AttributeListener {
         fun setIdentityLink(identityLink: Map<String, String>?) {
             Companion.identityLink = identityLink
         }
+    }
+
+    override fun onIdentifyCompleted(user: MParticleUser?, p1: FilteredIdentityApiRequest?) {
+
+    }
+
+    override fun onLoginCompleted(user: MParticleUser?, p1: FilteredIdentityApiRequest?) {
+        val identityLinks = mutableMapOf<String, String>()
+        user?.userIdentities?.forEach {
+            identityLinks.put(it.key.name, it.value)
+            setUserIdentity(it.key, it.value)
+        }
+        setIdentityLink(identityLink)
+    }
+
+    override fun onLogoutCompleted(user: MParticleUser?, p1: FilteredIdentityApiRequest?) {
+
+    }
+
+    override fun onModifyCompleted(user: MParticleUser?, p1: FilteredIdentityApiRequest?) {
+
+    }
+
+    override fun onUserIdentified(user: MParticleUser?) {
     }
 }

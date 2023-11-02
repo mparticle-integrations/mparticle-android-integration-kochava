@@ -144,7 +144,7 @@ class KochavaKit : KitIntegration(), AttributeListener, KitIntegration.IdentityL
 
     override fun onLoginCompleted(user: MParticleUser?, p1: FilteredIdentityApiRequest?) {
         val identityLinks = mutableMapOf<String, String>()
-        user?.userIdentities?.forEach {
+        user?.userIdentities?.iterator()?.forEach {
             identityLinks.put(it.key.name, it.value)
             setUserIdentity(it.key, it.value)
         }
